@@ -1,0 +1,80 @@
+ReleaseCat Maven Plugin
+Copyright 2018 George Aristy
+https://llorllale.github.io/releasecat-maven-plugin/
+
+Licensed under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on
+an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+
+
+
+This project includes:
+
+  ANTLR 3 Runtime under BSD licence
+  aopalliance version 1.0 repackaged as a module under CDDL + GPLv2 with classpath exception
+  Apache Commons Codec under The Apache Software License, Version 2.0
+  Apache Commons Lang under Apache License, Version 2.0
+  Apache Commons Logging under The Apache Software License, Version 2.0
+  Apache HttpClient under Apache License, Version 2.0
+  Apache HttpCore under Apache License, Version 2.0
+  AspectJ runtime under Eclipse Public License - v 1.0
+  Bean Validation API under The Apache Software License, Version 2.0
+  CDI APIs under Apache License, Version 2.0
+  Commons IO under The Apache Software License, Version 2.0
+  Extended StAX API under Dual license consisting of the CDDL v1.1 and GPL v2
+  fastinfoset under Apache License, Version 2.0
+  Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
+  Hamcrest Core under New BSD License
+  Hamcrest library under New BSD License
+  HK2 API module under CDDL + GPLv2 with classpath exception
+  HK2 Implementation Utilities under CDDL + GPLv2 with classpath exception
+  istack common utility code runtime under CDDL 1.1 or GPL2 w/ CPE
+  Java Architecture for XML Binding under CDDL 1.1 or GPL2 w/ CPE
+  Javassist under MPL 1.1 or LGPL 2.1 or Apache License 2.0
+  javax.annotation API under CDDL + GPLv2 with classpath exception
+  javax.inject under The Apache Software License, Version 2.0
+  javax.inject:1 as OSGi bundle under CDDL + GPLv2 with classpath exception
+  javax.ws.rs-api under CDDL 1.1 or GPL2 w/ CPE
+  JAXB Core under CDDL+GPL License
+  JAXB Runtime under CDDL+GPL License
+  jcabi-aspects under BSD
+  jcabi-github under BSD
+  jcabi-http under BSD
+  jcabi-immutable under BSD
+  jcabi-log under BSD
+  jcabi-manifests under BSD
+  jcabi-matchers under BSD
+  jcabi-xml under BSD
+  jersey-core-client under CDDL+GPL License
+  jersey-core-common under CDDL+GPL License
+  jersey-core-server under CDDL+GPL License
+  jersey-media-jaxb under CDDL+GPL License
+  jersey-repackaged-guava under CDDL+GPL License
+  JSR 353 (JSON Processing) Default Provider under Dual license consisting of the CDDL v1.1 and GPL v2
+  JSR-250 Common Annotations for the JavaTM Platform under COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+  JUnit under Eclipse Public License 1.0
+  Maven Artifact under Apache License, Version 2.0
+  Maven Model under Apache License, Version 2.0
+  Maven Plugin API under Apache License, Version 2.0
+  Maven Plugin Tools Java 5 Annotations under Apache License, Version 2.0
+  org.eclipse.sisu.inject under Eclipse Public License, Version 1.0
+  org.eclipse.sisu.plexus under Eclipse Public License, Version 1.0
+  OSGi resource locator bundle - used by various API providers that rely on META-INF/services mechanism to locate providers. under CDDL + GPLv2 with classpath exception
+  Plexus :: Component Annotations under The Apache Software License, Version 2.0
+  Plexus Classworlds under The Apache Software License, Version 2.0
+  Plexus Common Utilities under Apache License, Version 2.0
+  releasecat-maven-plugin under Apache License, Version 2.0
+  ServiceLocator Default Implementation under CDDL + GPLv2 with classpath exception
+  SLF4J API Module under MIT License
+  TXW2 Runtime under CDDL+GPL License
+  xembly under BSD
+
