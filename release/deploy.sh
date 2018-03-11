@@ -63,7 +63,7 @@ echo project version: $project_version
 echo is snapshot: $is_snapshot
 echo release version: $release_version
 
-openssl aes-256-cbc -K $encrypted_ed9a8466a19c_key -iv $encrypted_ed9a8466a19c_iv -in codesigning.asc.enc -out codesigning.asc -d
+openssl aes-256-cbc -K $encrypted_f5b43d6fd458_key -iv $encrypted_f5b43d6fd458_iv -in codesigning.asc.enc -out codesigning.asc -d
 gpg --fast-import codesigning.asc
 $MVN --settings mvnsettings.xml -P deploy -DskipTests=true clean deploy
 
