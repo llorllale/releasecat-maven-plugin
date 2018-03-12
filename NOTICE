@@ -28,6 +28,7 @@ This project includes:
   Apache HttpCore under Apache License, Version 2.0
   AspectJ runtime under Eclipse Public License - v 1.0
   Bean Validation API under The Apache Software License, Version 2.0
+  cactoos under MIT
   CDI APIs under Apache License, Version 2.0
   Commons IO under The Apache Software License, Version 2.0
   Extended StAX API under Dual license consisting of the CDDL v1.1 and GPL v2

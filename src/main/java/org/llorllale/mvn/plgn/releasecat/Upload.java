@@ -16,22 +16,90 @@
 
 package org.llorllale.mvn.plgn.releasecat;
 
+import com.jcabi.github.Coordinates;
+import com.jcabi.github.Release;
+import com.jcabi.github.Repo;
+import com.jcabi.github.RtGithub;
+import java.io.IOException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.cactoos.Scalar;
+import org.cactoos.scalar.IoCheckedScalar;
 
 /**
  * Uploads releases to GitHub.
  *
  * @author George Aristy (george.aristy@gmail.com)
  * @since 0.1.0
+ * @todo #1:30min Add description to releases. This will be useful for displaying changelogs
+ *  directly in the release. Right now we just have the tag and the name.
+ * @todo #1:30min Add ability to specify whether it's a prerelease or a full release. This
+ *  would be useful when uploading release candidates.
+ * @todo #1:30min Add ability to upload artifacts to releases. This will be useful when
+ *  someone wants to include sources and / or binaries.
  */
 @Mojo(name = "upload", defaultPhase = LifecyclePhase.DEPLOY)
 public final class Upload extends AbstractMojo {
+  @Parameter(name = "token", property = "releasecat.token")
+  private String token;
+
+  @Parameter(name = "user", property = "releasecat.user")
+  private String user;
+
+  @Parameter(name = "repo", property = "releasecat.repo")
+  private String repo;
+
+  @Parameter(name = "tag", property = "releasecat.tag")
+  private String tag;
+
+  @Parameter(name = "name", property = "releasecat.name")
+  private String name;
+
+  private final IoCheckedScalar<Repo> githubRepo;
+
+  /**
+   * Ctor.
+   * 
+   * @since 0.1.0
+   */
+  public Upload() {
+    this.githubRepo = new IoCheckedScalar<>(
+      () -> new RtGithub(this.token).repos().get(new Coordinates.Simple(this.user, this.repo))
+    );
+  }
+
+  /**
+   * For testing purposes.
+   * 
+   * @param tag the git tag
+   * @param name the release name
+   * @param repo the github repo
+   * @since 0.1.0
+   */
+  Upload(String tag, String name, Scalar<Repo> repo) {
+    this.tag = tag;
+    this.name = name;
+    this.githubRepo = new IoCheckedScalar<>(repo);
+  }
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    throw new UnsupportedOperationException("Not supported yet.");
+    this.getLog().info(String.format(
+      "Creating release with name %s and tag %s at %s/%s",
+      this.name, this.tag, this.user, this.repo
+    ));
+    try {
+      new Release.Smart(
+        this.githubRepo.value()
+          .releases()
+          .create(this.tag)
+      ).name(this.name);
+    } catch (IOException e) {
+      throw new MojoFailureException("Error creating release", e);
+    }
   }
 }
