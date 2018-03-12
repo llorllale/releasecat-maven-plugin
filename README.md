@@ -1,5 +1,6 @@
 # releasecat-maven-plugin ![icon](/src/site/resources/images/icon_64.png)
 
+[![EO principles respected here](http://www.elegantobjects.org/badge.svg)](http://www.elegantobjects.org)
 [![codecov](https://codecov.io/gh/llorllale/releasecat-maven-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/llorllale/releasecat-maven-plugin)
 [![Build Status](https://travis-ci.org/llorllale/releasecat-maven-plugin.svg?branch=master)](https://travis-ci.org/llorllale/releasecat-maven-plugin)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.llorllale/releasecat-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.llorllale/releasecat-maven-plugin)
