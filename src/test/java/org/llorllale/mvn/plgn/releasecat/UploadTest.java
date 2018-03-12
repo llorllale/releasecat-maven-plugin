@@ -87,4 +87,16 @@ public final class UploadTest {
       }
     ).execute();
   }
+
+  /**
+   * Mojo should fail if the configuration is not specified (ie. is null). This results in an
+   * internal IllegalArgumentException.
+   * 
+   * @throws Exception MojoFailureException
+   * @since 0.1.0
+   */
+  @Test(expected = MojoFailureException.class)
+  public void mojoFailureIfConfigNotSpecified() throws Exception {
+    new Upload().execute();
+  }
 }

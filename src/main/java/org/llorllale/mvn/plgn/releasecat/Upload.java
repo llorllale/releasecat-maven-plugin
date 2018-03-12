@@ -98,7 +98,7 @@ public final class Upload extends AbstractMojo {
           .releases()
           .create(this.tag)
       ).name(this.name);
-    } catch (IOException e) {
+    } catch (IOException | IllegalArgumentException e) {
       throw new MojoFailureException("Error creating release", e);
     }
   }
