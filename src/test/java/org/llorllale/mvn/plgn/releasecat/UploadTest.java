@@ -126,7 +126,6 @@ public final class UploadTest {
    *  releases with default values like this. That's why this test is checking for
    *  'Description of the release'. I've opened https://github.com/jcabi/jcabi-github/issues/1362
    *  for this issue. When that is fixed, come back here and refactor this test.
-   *  
    */
   @Test
   public void descriptionIsNullIfNotSpecified() throws Exception {
