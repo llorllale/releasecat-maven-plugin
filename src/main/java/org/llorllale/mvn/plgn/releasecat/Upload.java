@@ -118,7 +118,7 @@ public final class Upload extends AbstractMojo {
           .create(this.tag)
       );
       release.name(this.name);
-      if (Objects.nonNull(this.description) && this.description.length() > 0) {
+      if (Objects.nonNull(this.description)) {
         release.body(this.description);
       }
     } catch (IOException | IllegalArgumentException e) {
