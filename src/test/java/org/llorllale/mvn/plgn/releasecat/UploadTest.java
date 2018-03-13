@@ -16,8 +16,9 @@
 
 package org.llorllale.mvn.plgn.releasecat;
 
-// @checkstyle AvoidStaticImport (3 lines)
+// @checkstyle AvoidStaticImport (4 lines)
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -135,6 +136,42 @@ public final class UploadTest {
     assertThat(
       new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).body(),
       is("Description of the release")
+    );
+  }
+
+  /**
+   * Release should be marked as 'prerelease' if such is specified.
+   * 
+   * @throws Exception unexpected
+   * @since 0.2.0
+   * @todo #4:15min jcabi-github has a bug
+   *  (https://github.com/jcabi/jcabi-github/issues/1363) that makes it impossible to mark
+   *  a MkRelease as prerelease. When that is fixed, come back here and change 'assertFalse'
+   *  for 'assertTrue' and make sure it works.
+   */
+  @Test
+  public void prepreleaseTrue() throws Exception {
+    final Repo repo = new MkGithub("my_user").repos()
+      .create(new Repos.RepoCreate("my_project", false));
+    new Upload("Tag v1.0", "Name v1.0", "", true, () -> repo).execute();
+    assertFalse(
+      new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).prerelease()
+    );
+  }
+
+  /**
+   * Release should not be marked as 'prerelease' if such is not specified.
+   * 
+   * @throws Exception unexpected
+   * @since 0.2.0
+   */
+  @Test
+  public void prepreleaseFalse() throws Exception {
+    final Repo repo = new MkGithub().repos()
+      .create(new Repos.RepoCreate("my_user/my_project", false));
+    new Upload("Tag v1.0", "Name v1.0", "", false, () -> repo).execute();
+    assertFalse(
+      new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).prerelease()
     );
   }
 }

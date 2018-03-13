@@ -39,8 +39,6 @@ import org.cactoos.scalar.IoCheckedScalar;
  * @todo #1:30min Add ability to read the contents of a text file and use that
  *  the description of a release. This will be useful for chaining the output
  *  of changelog plugins (usually to a file) into this plugin.
- * @todo #1:30min Add ability to specify whether it's a prerelease or a full release. This
- *  would be useful when uploading release candidates.
  * @todo #1:30min Add ability to upload artifacts to releases. This will be useful when
  *  someone wants to include sources and / or binaries.
  */
@@ -63,6 +61,9 @@ public final class Upload extends AbstractMojo {
 
   @Parameter(name = "description", property = "releasecat.description")
   private String description;
+
+  @Parameter(name = "prerelease", property = "releasecat.prerelease", defaultValue = "false")
+  private boolean prerelease;
 
   private final IoCheckedScalar<Repo> githubRepo;
 
@@ -99,9 +100,25 @@ public final class Upload extends AbstractMojo {
    * @since 0.2.0
    */
   Upload(String tag, String name, String description, Scalar<Repo> repo) {
+    this(tag, name, description, false, repo);
+  }
+
+  /**
+   * For testing purposes.
+   * 
+   * @param tag the git tag
+   * @param name the release name
+   * @param description the release's description
+   * @param prerelease whether to mark the release as a 'prerelease' or not
+   * @param repo the github repo
+   * @since 0.2.0
+   */
+  @SuppressWarnings("checkstyle:ParameterNumber")
+  Upload(String tag, String name, String description, boolean prerelease, Scalar<Repo> repo) {
     this.tag = tag;
     this.name = name;
     this.description = description;
+    this.prerelease = prerelease;
     this.githubRepo = new IoCheckedScalar<>(repo);
   }
 
@@ -121,6 +138,7 @@ public final class Upload extends AbstractMojo {
       if (Objects.nonNull(this.description)) {
         release.body(this.description);
       }
+      release.prerelease(this.prerelease);
     } catch (IOException | IllegalArgumentException e) {
       throw new MojoFailureException("Error creating release", e);
     }
