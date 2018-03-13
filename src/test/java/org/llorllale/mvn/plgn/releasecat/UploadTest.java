@@ -27,8 +27,15 @@ import com.jcabi.github.Releases;
 import com.jcabi.github.Repo;
 import com.jcabi.github.Repos;
 import com.jcabi.github.mock.MkGithub;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import org.apache.maven.plugin.MojoFailureException;
+import org.cactoos.io.InputOf;
+import org.cactoos.io.LengthOf;
+import org.cactoos.io.OutputTo;
+import org.cactoos.io.TeeInput;
+import org.cactoos.text.TextOf;
 import org.junit.Test;
 
 /**
@@ -172,6 +179,56 @@ public final class UploadTest {
     new Upload("Tag v1.0", "Name v1.0", "", false, () -> repo).execute();
     assertFalse(
       new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).prerelease()
+    );
+  }
+
+  /**
+   * Release must have description text from the given file.
+   * 
+   * @throws Exception unexpected
+   * @since 0.3.0
+   */
+  @Test
+  public void releaseDescriptionFromFile() throws Exception {
+    final File description = Files.createTempFile("", "").toFile();
+    new LengthOf(
+      new TeeInput(
+        new InputOf("This is a test description from file."),
+        new OutputTo(description)
+      )
+    ).value();
+    final Repo repo = new MkGithub("my_user").repos()
+      .create(new Repos.RepoCreate("my_project", false));
+    new Upload("Tag v1.0", "Name v1.0", null, description, false, () -> repo).execute();
+    assertThat(
+      new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).body(),
+      is(new TextOf(description).asString())
+    );
+  }
+
+  /**
+   * Release must have description text from the given file.
+   * 
+   * @throws Exception unexpected
+   * @since 0.3.0
+   */
+  @Test
+  public void descriptionConfigHasPrecedenceOverDescriptionFromFile() throws Exception {
+    final File file = Files.createTempFile("", "").toFile();
+    new LengthOf(
+      new TeeInput(
+        new InputOf("This is a test description from file."),
+        new OutputTo(file)
+      )
+    ).value();
+    final Repo repo = new MkGithub("my_user").repos()
+      .create(new Repos.RepoCreate("my_project", false));
+    new Upload(
+      "Tag v1.0", "Name v1.0", "Inline description", file, false, () -> repo
+    ).execute();
+    assertThat(
+      new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).body(),
+      is("Inline description")
     );
   }
 }

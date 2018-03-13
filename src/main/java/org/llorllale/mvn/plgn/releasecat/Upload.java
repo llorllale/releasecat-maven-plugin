@@ -20,6 +20,7 @@ import com.jcabi.github.Coordinates;
 import com.jcabi.github.Release;
 import com.jcabi.github.Repo;
 import com.jcabi.github.RtGithub;
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import org.apache.maven.plugin.AbstractMojo;
@@ -30,15 +31,13 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.cactoos.Scalar;
 import org.cactoos.scalar.IoCheckedScalar;
+import org.cactoos.text.TextOf;
 
 /**
  * Uploads releases to GitHub.
  *
  * @author George Aristy (george.aristy@gmail.com)
  * @since 0.1.0
- * @todo #1:30min Add ability to read the contents of a text file and use that
- *  the description of a release. This will be useful for chaining the output
- *  of changelog plugins (usually to a file) into this plugin.
  * @todo #1:30min Add ability to upload artifacts to releases. This will be useful when
  *  someone wants to include sources and / or binaries.
  */
@@ -61,6 +60,9 @@ public final class Upload extends AbstractMojo {
 
   @Parameter(name = "description", property = "releasecat.description")
   private String description;
+
+  @Parameter(name = "descriptionFromFile", property = "releasecat.descriptionFromFile")
+  private File descriptionFromFile;
 
   @Parameter(name = "prerelease", property = "releasecat.prerelease", defaultValue = "false")
   private boolean prerelease;
@@ -122,6 +124,30 @@ public final class Upload extends AbstractMojo {
     this.githubRepo = new IoCheckedScalar<>(repo);
   }
 
+  /**
+   * For testing purposes.
+   * 
+   * @param tag the git tag
+   * @param name the release name
+   * @param description the release's description (has precedence over {@code descriptionFile}
+   * @param descriptionFile the file from which to get the description
+   * @param prerelease whether to mark the release as a 'prerelease' or not
+   * @param repo the github repo
+   * @since 0.3.0
+   */
+  @SuppressWarnings("checkstyle:ParameterNumber")
+  Upload(
+    String tag, String name, String description, File descriptionFile,
+    boolean prerelease, Scalar<Repo> repo
+  ) {
+    this.tag = tag;
+    this.name = name;
+    this.description = description;
+    this.descriptionFromFile = descriptionFile;
+    this.prerelease = prerelease;
+    this.githubRepo = new IoCheckedScalar<>(repo);
+  }
+
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     this.getLog().info(String.format(
@@ -137,6 +163,10 @@ public final class Upload extends AbstractMojo {
       release.name(this.name);
       if (Objects.nonNull(this.description)) {
         release.body(this.description);
+      } else if (Objects.nonNull(this.descriptionFromFile)) {
+        release.body(
+          new TextOf(this.descriptionFromFile).asString()
+        );
       }
       release.prerelease(this.prerelease);
     } catch (IOException | IllegalArgumentException e) {
