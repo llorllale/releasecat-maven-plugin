@@ -22,7 +22,10 @@ import com.jcabi.github.Repo;
 import com.jcabi.github.RtGithub;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,6 +33,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.cactoos.Scalar;
+import org.cactoos.io.BytesOf;
 import org.cactoos.scalar.IoCheckedScalar;
 import org.cactoos.text.TextOf;
 
@@ -38,8 +42,9 @@ import org.cactoos.text.TextOf;
  *
  * @author George Aristy (george.aristy@gmail.com)
  * @since 0.1.0
- * @todo #1:30min Add ability to upload artifacts to releases. This will be useful when
- *  someone wants to include sources and / or binaries.
+ * @todo #5:15min The following configurations must be marked as required: token, user, repo, tag.
+ *  'Token' is used to authenticate against GitHub'; 'user' is the user to whom the project belongs
+ *  to; 'repo' is the name of the project; 'tag' is the name of the tag to apply to the release.
  */
 @Mojo(name = "upload", defaultPhase = LifecyclePhase.DEPLOY)
 public final class Upload extends AbstractMojo {
@@ -66,6 +71,9 @@ public final class Upload extends AbstractMojo {
 
   @Parameter(name = "prerelease", property = "releasecat.prerelease", defaultValue = "false")
   private boolean prerelease;
+
+  @Parameter(name = "assets")
+  private List<Asset> assets;
 
   private final IoCheckedScalar<Repo> githubRepo;
 
@@ -117,11 +125,7 @@ public final class Upload extends AbstractMojo {
    */
   @SuppressWarnings("checkstyle:ParameterNumber")
   Upload(String tag, String name, String description, boolean prerelease, Scalar<Repo> repo) {
-    this.tag = tag;
-    this.name = name;
-    this.description = description;
-    this.prerelease = prerelease;
-    this.githubRepo = new IoCheckedScalar<>(repo);
+    this(tag, name, description, null, prerelease, repo);
   }
 
   /**
@@ -140,11 +144,32 @@ public final class Upload extends AbstractMojo {
     String tag, String name, String description, File descriptionFile,
     boolean prerelease, Scalar<Repo> repo
   ) {
+    this(tag, name, description, descriptionFile, prerelease, Collections.emptyList(), repo);
+  }
+
+  /**
+   * For testing purposes.
+   * 
+   * @param tag the git tag
+   * @param name the release name
+   * @param description the release's description (has precedence over {@code descriptionFile}
+   * @param descriptionFile the file from which to get the description
+   * @param prerelease whether to mark the release as a 'prerelease' or not
+   * @param assets the list of assets to attach to the release
+   * @param repo the github repo
+   * @since 0.4.0
+   */
+  @SuppressWarnings("checkstyle:ParameterNumber")
+  Upload(
+    String tag, String name, String description, File descriptionFile,
+    boolean prerelease, List<Asset> assets, Scalar<Repo> repo
+  ) {
     this.tag = tag;
     this.name = name;
     this.description = description;
     this.descriptionFromFile = descriptionFile;
     this.prerelease = prerelease;
+    this.assets = assets;
     this.githubRepo = new IoCheckedScalar<>(repo);
   }
 
@@ -169,8 +194,26 @@ public final class Upload extends AbstractMojo {
         );
       }
       release.prerelease(this.prerelease);
+      this.attach(release, Optional.ofNullable(this.assets).orElse(Collections.emptyList()));
     } catch (IOException | IllegalArgumentException e) {
       throw new MojoFailureException("Error creating release", e);
+    }
+  }
+
+  /**
+   * Attaches the {@code assets} to the {@code release}.
+   * 
+   * @param release the release
+   * @param files the assets to attach
+   * @throws IOException if an I/O error occurs
+   */
+  private void attach(Release release, List<Asset> files) throws IOException {
+    for (Asset asset : files) {
+      release.assets().upload(
+        new BytesOf(asset.getFile()).asBytes(),
+        asset.getType(),
+        asset.getName()
+      );
     }
   }
 }
