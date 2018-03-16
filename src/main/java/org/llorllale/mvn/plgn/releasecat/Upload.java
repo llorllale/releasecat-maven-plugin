@@ -42,22 +42,23 @@ import org.cactoos.text.TextOf;
  *
  * @author George Aristy (george.aristy@gmail.com)
  * @since 0.1.0
- * @todo #5:15min The following configurations must be marked as required: token, user, repo, tag.
- *  'Token' is used to authenticate against GitHub'; 'user' is the user to whom the project belongs
- *  to; 'repo' is the name of the project; 'tag' is the name of the tag to apply to the release.
+ * @todo #14:30min Replace 'user' with 'org'. The username can already be obtained via jcabi-github
+ *  using the token. 'org' must be optional: if specified then it is used as the "user".
+ * @todo #14:30min 'name' should be optional. If not specified then it's simply not set. Currently
+ *  we're always setting the release's name whether we have it or not.
  */
 @Mojo(name = "upload", defaultPhase = LifecyclePhase.DEPLOY)
 public final class Upload extends AbstractMojo {
-  @Parameter(name = "token", property = "releasecat.token")
+  @Parameter(name = "token", property = "releasecat.token", required = true)
   private String token;
 
-  @Parameter(name = "user", property = "releasecat.user")
+  @Parameter(name = "user", property = "releasecat.user", required = true)
   private String user;
 
-  @Parameter(name = "repo", property = "releasecat.repo")
+  @Parameter(name = "repo", property = "releasecat.repo", required = true)
   private String repo;
 
-  @Parameter(name = "tag", property = "releasecat.tag")
+  @Parameter(name = "tag", property = "releasecat.tag", required = true)
   private String tag;
 
   @Parameter(name = "name", property = "releasecat.name")
