@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import com.jcabi.github.Release;
+import com.jcabi.github.ReleaseAsset;
 import com.jcabi.github.Releases;
 import com.jcabi.github.Repo;
 import com.jcabi.github.Repos;
@@ -30,12 +31,18 @@ import com.jcabi.github.mock.MkGithub;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
+import javax.xml.bind.DatatypeConverter;
 import org.apache.maven.plugin.MojoFailureException;
+import org.cactoos.io.BytesOf;
 import org.cactoos.io.InputOf;
 import org.cactoos.io.LengthOf;
 import org.cactoos.io.OutputTo;
 import org.cactoos.io.TeeInput;
+import org.cactoos.io.TempFile;
 import org.cactoos.text.TextOf;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -45,7 +52,7 @@ import org.junit.Test;
  * @since 0.1.0
  * @checkstyle MethodName (500 lines)
  */
-@SuppressWarnings("checkstyle:MultipleStringLiterals")
+@SuppressWarnings({"checkstyle:MultipleStringLiterals", "checkstyle:MethodCount"})
 public final class UploadTest {
   /**
    * Release should be created with the given tag.
@@ -230,5 +237,109 @@ public final class UploadTest {
       new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).body(),
       is("Inline description")
     );
+  }
+
+  /**
+   * Asset must have the given name.
+   * 
+   * @throws Exception unexpected
+   * @since 0.4.0
+   */
+  @Test
+  public void uploadAssetsWithSpecifiedName() throws Exception {
+    final File asset = Files.createTempFile("", "").toFile();
+    new LengthOf(
+      new TeeInput(
+        new InputOf("This is a test asset."),
+        new OutputTo(asset)
+      )
+    ).value();
+    final List<Asset> assets = Arrays.asList(
+      new Asset("test_asset.txt", "text/plain", asset)
+    );
+    final Repo repo = new MkGithub().repos()
+      .create(new Repos.RepoCreate("my_user/my_project", false));
+    new Upload(
+      "Tag v1.0", "Name v1.0", "Inline description", null, false, assets, () -> repo
+    ).execute();
+    assertThat(
+      new ReleaseAsset.Smart(
+        new Releases.Smart(repo.releases()).find("Tag v1.0").assets().get(1)
+      ).name(),
+      is(assets.get(0).getName())
+    );
+  }
+
+  /**
+   * Asset must have the given content type.
+   * 
+   * @throws Exception unexpected
+   * @since 0.4.0
+   */
+  @Test
+  public void uploadAssetsWithSpecifiedType() throws Exception {
+    final File asset = Files.createTempFile("", "").toFile();
+    new LengthOf(
+      new TeeInput(
+        new InputOf("This is a test asset."),
+        new OutputTo(asset)
+      )
+    ).value();
+    final List<Asset> assets = Arrays.asList(
+      new Asset("test_asset.txt", "text/plain", asset)
+    );
+    final Repo repo = new MkGithub().repos()
+      .create(new Repos.RepoCreate("my_user/my_project", false));
+    new Upload(
+      "Tag v1.0", "Name v1.0", "Inline description", null, false, assets, () -> repo
+    ).execute();
+    assertThat(
+      new ReleaseAsset.Smart(
+        new Releases.Smart(repo.releases()).find("Tag v1.0").assets().get(1)
+      ).contentType(),
+      is(assets.get(0).getType())
+    );
+  }
+
+  /**
+   * Asset must have the same contents.
+   * 
+   * @throws Exception unexpected
+   * @since 0.4.0
+   * @todo #5:30min jcabi-github has a bug in how the MkReleaseAssets and MkReleaseAsset handle
+   *  the contents of the asset - see bug https://github.com/jcabi/jcabi-github/issues/1366.
+   *  After the bug is fixed, come back and unignore this test.
+   */
+  @Ignore
+  @Test
+  public void uploadAssetsWithSpecifiedContents() throws Exception {
+    try (TempFile asset = new TempFile()) {
+      new LengthOf(
+        new TeeInput(
+          new InputOf("This is a test asset."),
+          new OutputTo(asset.value())
+        )
+      ).value();
+      final List<Asset> assets = Arrays.asList(
+        new Asset("test_asset.txt", "text/plain", asset.value().toFile())
+      );
+      final Repo repo = new MkGithub("my_user").repos()
+        .create(new Repos.RepoCreate("my_project", false));
+      new Upload(
+        "Tag v1.0", "Name v1.0", "Inline description", null, false, assets, () -> repo
+      ).execute();
+      assertThat(
+        new TextOf(
+          DatatypeConverter.printBase64Binary(
+            new BytesOf(
+              new InputOf(
+                new Releases.Smart(repo.releases()).find("Tag v1.0").assets().get(1).raw()
+              )
+            ).asBytes()
+          )
+        ),
+        is(new TextOf(asset.value()))
+      );
+    }
   }
 }
