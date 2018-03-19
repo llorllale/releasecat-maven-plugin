@@ -342,4 +342,23 @@ public final class UploadTest {
       );
     }
   }
+
+  /**
+   * Release should not be created with a name if it is not given.
+   * 
+   * @throws Exception unexpected
+   * @since 0.1.0
+   * @todo #17:30min Impediment on jcabi github: https://github.com/jcabi/jcabi-github/issues/1362.
+   *  Come back and change the test to nullValue() this test when that issue is fixed.
+   */
+  @Test
+  public void releaseHasNoNameIfNotProvided() throws Exception {
+    final Repo repo = new MkGithub().repos()
+      .create(new Repos.RepoCreate("my_user/my_project", false));
+    new Upload("Tag v1.0", null, () -> repo).execute();
+    assertThat(
+      new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).name(),
+      is("v1.0.0")
+    );
+  }
 }
