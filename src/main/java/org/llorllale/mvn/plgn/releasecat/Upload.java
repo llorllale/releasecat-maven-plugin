@@ -44,8 +44,6 @@ import org.cactoos.text.TextOf;
  * @since 0.1.0
  * @todo #14:30min Replace 'user' with 'org'. The username can already be obtained via jcabi-github
  *  using the token. 'org' must be optional: if specified then it is used as the "user".
- * @todo #14:30min 'name' should be optional. If not specified then it's simply not set. Currently
- *  we're always setting the release's name whether we have it or not.
  */
 @Mojo(name = "upload", defaultPhase = LifecyclePhase.DEPLOY)
 public final class Upload extends AbstractMojo {
@@ -175,6 +173,7 @@ public final class Upload extends AbstractMojo {
   }
 
   @Override
+  @SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
   public void execute() throws MojoExecutionException, MojoFailureException {
     this.getLog().info(String.format(
       "Creating release with name %s and tag %s at %s/%s",
@@ -186,7 +185,9 @@ public final class Upload extends AbstractMojo {
           .releases()
           .create(this.tag)
       );
-      release.name(this.name);
+      if (Objects.nonNull(this.name)) {
+        release.name(this.name);
+      }
       if (Objects.nonNull(this.description)) {
         release.body(this.description);
       } else if (Objects.nonNull(this.descriptionFromFile)) {
@@ -195,26 +196,15 @@ public final class Upload extends AbstractMojo {
         );
       }
       release.prerelease(this.prerelease);
-      this.attach(release, Optional.ofNullable(this.assets).orElse(Collections.emptyList()));
+      for (Asset asset : Optional.ofNullable(this.assets).orElse(Collections.emptyList())) {
+        release.assets().upload(
+          new BytesOf(asset.getFile()).asBytes(),
+          asset.getType(),
+          asset.getName()
+        );
+      }
     } catch (IOException | IllegalArgumentException e) {
       throw new MojoFailureException("Error creating release", e);
-    }
-  }
-
-  /**
-   * Attaches the {@code assets} to the {@code release}.
-   * 
-   * @param release the release
-   * @param files the assets to attach
-   * @throws IOException if an I/O error occurs
-   */
-  private void attach(Release release, List<Asset> files) throws IOException {
-    for (Asset asset : files) {
-      release.assets().upload(
-        new BytesOf(asset.getFile()).asBytes(),
-        asset.getType(),
-        asset.getName()
-      );
     }
   }
 }
