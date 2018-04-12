@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.maven.plugin.MojoFailureException;
-import org.cactoos.io.BytesOf;
 import org.cactoos.io.InputOf;
 import org.cactoos.io.LengthOf;
 import org.cactoos.io.OutputTo;
@@ -307,11 +306,7 @@ public final class UploadTest {
    * 
    * @throws Exception unexpected
    * @since 0.4.0
-   * @todo #5:30min jcabi-github has a bug in how the MkReleaseAssets and MkReleaseAsset handle
-   *  the contents of the asset - see bug https://github.com/jcabi/jcabi-github/issues/1366.
-   *  After the bug is fixed, come back and unignore this test.
    */
-  @Ignore
   @Test
   public void uploadAssetsWithSpecifiedContents() throws Exception {
     try (TempFile asset = new TempFile()) {
@@ -321,25 +316,24 @@ public final class UploadTest {
           new OutputTo(asset.value())
         )
       ).value();
-      final List<Asset> assets = Arrays.asList(
-        new Asset("test_asset.txt", "text/plain", asset.value().toFile())
-      );
       final Repo repo = new MkGithub("my_user").repos()
         .create(new Repos.RepoCreate("my_project", false));
       new Upload(
-        "Tag v1.0", "Name v1.0", "Inline description", null, false, assets, () -> repo
+        "Tag v1.0", "Name v1.0", "Inline description", null, false,
+        Arrays.asList(new Asset("test_asset.txt", "text/plain", asset.value().toFile())),
+        () -> repo
       ).execute();
       assertThat(
         new TextOf(
-          DatatypeConverter.printBase64Binary(
-            new BytesOf(
+          DatatypeConverter.parseBase64Binary(
+            new TextOf(
               new InputOf(
                 new Releases.Smart(repo.releases()).find("Tag v1.0").assets().get(1).raw()
               )
-            ).asBytes()
+            ).asString()
           )
-        ),
-        is(new TextOf(asset.value()))
+        ).asString(),
+        is(new TextOf(asset.value()).asString())
       );
     }
   }
