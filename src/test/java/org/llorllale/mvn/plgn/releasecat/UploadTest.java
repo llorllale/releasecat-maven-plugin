@@ -41,7 +41,6 @@ import org.cactoos.io.OutputTo;
 import org.cactoos.io.TeeInput;
 import org.cactoos.io.TempFile;
 import org.cactoos.text.TextOf;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -136,20 +135,15 @@ public final class UploadTest {
    * 
    * @throws Exception unexpected
    * @since 0.2.0
-   * @todo #3:30min jcabi-github should not be prepopulating optional attributes of fake
-   *  releases with default values like this. That's why this test is checking for
-   *  'Description of the release'. I've opened https://github.com/jcabi/jcabi-github/issues/1362
-   *  for this issue. When that is fixed, come back here and refactor this test.
    */
-  @Ignore
   @Test
-  public void descriptionIsNullIfNotSpecified() throws Exception {
+  public void descriptionIsEmptyIfNotSpecified() throws Exception {
     final Repo repo = new MkGithub().repos()
       .create(new Repos.RepoCreate("my_user/my_project", false));
     new Upload("Tag v1.0", "Name v1.0", null, () -> repo).execute();
     assertThat(
       new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).body(),
-      is("Description of the release")
+      is("")
     );
   }
 
