@@ -142,6 +142,7 @@ public final class UploadTest {
    *  'Description of the release'. I've opened https://github.com/jcabi/jcabi-github/issues/1362
    *  for this issue. When that is fixed, come back here and refactor this test.
    */
+  @Ignore
   @Test
   public void descriptionIsNullIfNotSpecified() throws Exception {
     final Repo repo = new MkGithub().repos()
@@ -348,8 +349,6 @@ public final class UploadTest {
    * 
    * @throws Exception unexpected
    * @since 0.1.0
-   * @todo #17:30min Impediment on jcabi github: https://github.com/jcabi/jcabi-github/issues/1362.
-   *  Come back and change the test to nullValue() this test when that issue is fixed.
    */
   @Test
   public void releaseHasNoNameIfNotProvided() throws Exception {
@@ -358,7 +357,7 @@ public final class UploadTest {
     new Upload("Tag v1.0", null, () -> repo).execute();
     assertThat(
       new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).name(),
-      is("v1.0.0")
+      is("")
     );
   }
 }
