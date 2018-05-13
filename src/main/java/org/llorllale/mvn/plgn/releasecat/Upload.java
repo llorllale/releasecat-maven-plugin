@@ -42,8 +42,6 @@ import org.cactoos.text.TextOf;
  *
  * @author George Aristy (george.aristy@gmail.com)
  * @since 0.1.0
- * @todo #14:30min Replace 'user' with 'org'. The username can already be obtained via jcabi-github
- *  using the token. 'org' must be optional: if specified then it is used as the "user".
  */
 @Mojo(name = "upload", defaultPhase = LifecyclePhase.DEPLOY)
 public final class Upload extends AbstractMojo {
