@@ -16,11 +16,12 @@
 
 package org.llorllale.mvn.plgn.releasecat;
 
-// @checkstyle AvoidStaticImport (4 lines)
+// @checkstyle AvoidStaticImport (5 lines)
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import com.jcabi.github.Release;
 import com.jcabi.github.ReleaseAsset;
@@ -152,17 +153,13 @@ public final class UploadTest {
    * 
    * @throws Exception unexpected
    * @since 0.2.0
-   * @todo #4:15min jcabi-github has a bug
-   *  (https://github.com/jcabi/jcabi-github/issues/1363) that makes it impossible to mark
-   *  a MkRelease as prerelease. When that is fixed, come back here and change 'assertFalse'
-   *  for 'assertTrue' and make sure it works.
    */
   @Test
   public void prepreleaseTrue() throws Exception {
     final Repo repo = new MkGithub("my_user").repos()
       .create(new Repos.RepoCreate("my_project", false));
     new Upload("Tag v1.0", "Name v1.0", "", true, () -> repo).execute();
-    assertFalse(
+    assertTrue(
       new Release.Smart(new Releases.Smart(repo.releases()).find("Tag v1.0")).prerelease()
     );
   }
